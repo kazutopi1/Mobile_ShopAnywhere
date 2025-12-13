@@ -11,13 +11,9 @@ namespace ShopAnywhere
     public class Shop : Mod
     {
         private static Response[] categories;
-
         private static StardewValley.GameLocation.afterQuestionBehavior categoriesOptionsLogic;
-
         private static bool wasBTapped = false;
-
         private static string lastLocationName;
-
         private static Vector2 lastTilePos;
 
         public override void Entry(IModHelper helper)
@@ -57,34 +53,21 @@ namespace ShopAnywhere
                         {
                             if (whichAnswer == "category1")
                             {
-                                DelayedAction.functionAfterDelay(() =>
-                                {
-                                    category1();
-                                }, 34);
+                                DelayedAction.functionAfterDelay(() => { category1(); }, 34);
                             }
                             else if (whichAnswer == "category2")
                             {
-                                DelayedAction.functionAfterDelay(() =>
-                                {
-                                    category2();
-                                }, 34);
+                                DelayedAction.functionAfterDelay(() => { category2(); }, 34);
                             }
                             else if (whichAnswer == "category3")
                             {
-                                DelayedAction.functionAfterDelay(() =>
-                                {
-                                    category3();
-                                }, 34);
+                                DelayedAction.functionAfterDelay(() => { category3(); }, 34);
                             }
                             else if (whichAnswer == "others")
                             {
-                                DelayedAction.functionAfterDelay(() =>
-                                {
-                                    others();
-                                }, 34);
+                                DelayedAction.functionAfterDelay(() => { others(); }, 34);
                             }
                         };
-
                         Game1.currentLocation.createQuestionDialogue(
                             question: "Categories",
                             answerChoices: categories,
@@ -98,41 +81,11 @@ namespace ShopAnywhere
         }
         private static void Postfix2()
         {
-            DelayedAction.functionAfterDelay(() =>
-            {
-                Game1.warpFarmer(
-                    lastLocationName,
-                    (int)lastTilePos.X,
-                    (int)lastTilePos.Y,
-                    Game1.player.FacingDirection,
-                    doFade: false
-                );
-                Game1.player.viewingLocation.Value = null;
-                Game1.displayHUD = true;
-                Game1.currentLocation.resetForPlayerEntry();
-                Game1.player.forceCanMove();
-                Game1.exitActiveMenu();
-
-            }, 50);
+            WarpPlayer();
         }
         private static void Postfix3()
         {
-            DelayedAction.functionAfterDelay(() =>
-            {
-                Game1.warpFarmer(
-                    lastLocationName,
-                    (int)lastTilePos.X,
-                    (int)lastTilePos.Y,
-                    Game1.player.FacingDirection,
-                    doFade: false
-                );
-                Game1.player.viewingLocation.Value = null;
-                Game1.displayHUD = true;
-                Game1.currentLocation.resetForPlayerEntry();
-                Game1.player.forceCanMove();
-                Game1.exitActiveMenu();
-
-            }, 50);
+            WarpPlayer();
         }
         private static void category1()
         {
@@ -147,36 +100,19 @@ namespace ShopAnywhere
             {
                 if (cat1answers == "seedShop")
                 {
-                    Utility.TryOpenShopMenu(
-                        shopId: Game1.shop_generalStore,
-                        ownerName: null
-                    );
+                    Utility.TryOpenShopMenu(Game1.shop_generalStore, null, false);
                 }
                 else if (cat1answers == "fishShop")
                 {
-                    Utility.TryOpenShopMenu(
-                        shopId: Game1.shop_fish,
-                        ownerName: null
-                    );
+                    Utility.TryOpenShopMenu(Game1.shop_fish, null, false);
                 }
                 else if (cat1answers == "saloon")
                 {
-                    Utility.TryOpenShopMenu(
-                        shopId: Game1.shop_saloon,
-                        ownerName: null
-                    );
+                    Utility.TryOpenShopMenu(Game1.shop_saloon, null, false);
                 }
                 else if (cat1answers == "return")
                 {
-                    DelayedAction.functionAfterDelay(() =>
-                    {
-                        Game1.currentLocation.createQuestionDialogue(
-                            question: "Categories",
-                            answerChoices: categories,
-                            afterDialogueBehavior: categoriesOptionsLogic,
-                            speaker: null
-                        );
-                    }, 34);
+                    MainCategory();
                 }
             };
             Game1.currentLocation.createQuestionDialogue(
@@ -200,43 +136,23 @@ namespace ShopAnywhere
             {
                 if (cat2answers == "adventureShop")
                 {
-                    Utility.TryOpenShopMenu(
-                        shopId: Game1.shop_adventurersGuild,
-                        ownerName: null
-                    );
+                    Utility.TryOpenShopMenu(Game1.shop_adventurersGuild, null, false);
                 }
                 else if (cat2answers == "blacksmith")
                 {
-                    Utility.TryOpenShopMenu(
-                        shopId: Game1.shop_blacksmith,
-                        ownerName: null
-                    );
+                    Utility.TryOpenShopMenu(Game1.shop_blacksmith, null, false);
                 }
                 else if (cat2answers == "toolUpgrades")
                 {
-                    Utility.TryOpenShopMenu(
-                        shopId: Game1.shop_blacksmithUpgrades,
-                        ownerName: null
-                    );
+                    Utility.TryOpenShopMenu(Game1.shop_blacksmithUpgrades, null, false);
                 }
                 else if (cat2answers == "desertTrader")
                 {
-                    Utility.TryOpenShopMenu(
-                        shopId: Game1.shop_desertTrader,
-                        ownerName: null
-                    );
+                    Utility.TryOpenShopMenu(Game1.shop_desertTrader, null, false);
                 }
                 else if (cat2answers == "return2")
                 {
-                    DelayedAction.functionAfterDelay(() =>
-                    {
-                        Game1.currentLocation.createQuestionDialogue(
-                            question: "Categories",
-                            answerChoices: categories,
-                            afterDialogueBehavior: categoriesOptionsLogic,
-                            speaker: null
-                        );
-                    }, 34);
+                    MainCategory();
                 }
             };
             Game1.currentLocation.createQuestionDialogue(
@@ -258,10 +174,7 @@ namespace ShopAnywhere
             {
                 if (cat3answers == "carpenter")
                 {
-                    Utility.TryOpenShopMenu(
-                        shopId: Game1.shop_carpenter,
-                        ownerName: null
-                    );
+                    Utility.TryOpenShopMenu(Game1.shop_carpenter, null, false);
                 }
                 else if (cat3answers == "buildBuildings")
                 {
@@ -269,21 +182,12 @@ namespace ShopAnywhere
                     {
                         lastLocationName = Game1.currentLocation.Name;
                         lastTilePos = Game1.player.Tile;
-
                         Game1.activeClickableMenu = new StardewValley.Menus.CarpenterMenu("Robin");
                     }, 34);
                 }
                 else if (cat3answers == "return3")
                 {
-                    DelayedAction.functionAfterDelay(() =>
-                    {
-                        Game1.currentLocation.createQuestionDialogue(
-                            question: "Categories",
-                            answerChoices: categories,
-                            afterDialogueBehavior: categoriesOptionsLogic,
-                            speaker: null
-                        );
-                    }, 34);
+                    MainCategory();
                 }
             };
             Game1.currentLocation.createQuestionDialogue(
@@ -306,36 +210,19 @@ namespace ShopAnywhere
             {
                 if (othAnswers == "wanderingTrader")
                 {
-                    Utility.TryOpenShopMenu(
-                        shopId: Game1.shop_travelingCart,
-                        ownerName: null
-                    );
+                    Utility.TryOpenShopMenu(Game1.shop_travelingCart, null, false);
                 }
                 else if (othAnswers == "dwarf")
                 {
-                    Utility.TryOpenShopMenu(
-                        shopId: Game1.shop_dwarf,
-                        ownerName: null
-                    );
+                    Utility.TryOpenShopMenu(Game1.shop_dwarf, null, false);
                 }
                 else if (othAnswers == "krobus")
                 {
-                    Utility.TryOpenShopMenu(
-                        shopId: Game1.shop_krobus,
-                        ownerName: null
-                    );
+                    Utility.TryOpenShopMenu(Game1.shop_krobus, null, false);
                 }
                 else if (othAnswers == "othReturn")
                 {
-                    DelayedAction.functionAfterDelay(() =>
-                    {
-                        Game1.currentLocation.createQuestionDialogue(
-                            question: "Categories",
-                            answerChoices: categories,
-                            afterDialogueBehavior: categoriesOptionsLogic,
-                            speaker: null
-                        );
-                    }, 34);
+                    MainCategory();
                 }
             };
             Game1.currentLocation.createQuestionDialogue(
@@ -344,6 +231,36 @@ namespace ShopAnywhere
                 afterDialogueBehavior: othLogic,
                 speaker: null
             );
+        }
+        private static void MainCategory()
+        {
+            DelayedAction.functionAfterDelay(() =>
+            {
+                Game1.currentLocation.createQuestionDialogue(
+                    question: "Categories",
+                    answerChoices: categories,
+                    afterDialogueBehavior: categoriesOptionsLogic,
+                    speaker: null
+                );
+            }, 34);
+        }
+        private static void WarpPlayer()
+        {
+            DelayedAction.functionAfterDelay(() =>
+            {
+                Game1.warpFarmer(
+                    lastLocationName,
+                    (int)lastTilePos.X,
+                    (int)lastTilePos.Y,
+                    Game1.player.FacingDirection,
+                    doFade: false
+                );
+                Game1.player.viewingLocation.Value = null;
+                Game1.displayHUD = true;
+                Game1.currentLocation.resetForPlayerEntry();
+                Game1.player.forceCanMove();
+                Game1.exitActiveMenu();
+            }, 50);
         }
     }
 }
