@@ -51,21 +51,20 @@ namespace ShopAnywhere
                         };
                         categoriesOptionsLogic = (Farmer who, string whichAnswer) =>
                         {
-                            if (whichAnswer == "category1")
+                            switch (whichAnswer)
                             {
-                                DelayedAction.functionAfterDelay(() => { category1(); }, 34);
-                            }
-                            else if (whichAnswer == "category2")
-                            {
-                                DelayedAction.functionAfterDelay(() => { category2(); }, 34);
-                            }
-                            else if (whichAnswer == "category3")
-                            {
-                                DelayedAction.functionAfterDelay(() => { category3(); }, 34);
-                            }
-                            else if (whichAnswer == "others")
-                            {
-                                DelayedAction.functionAfterDelay(() => { others(); }, 34);
+                                case "category1":
+                                    DelayedAction.functionAfterDelay(category1, 34);
+                                    break;
+                                case "category2":
+                                    DelayedAction.functionAfterDelay(category2, 34);
+                                    break;
+                                case "category3":
+                                    DelayedAction.functionAfterDelay(category3, 34);
+                                    break;
+                                case "others":
+                                    DelayedAction.functionAfterDelay(others, 34);
+                                    break;
                             }
                         };
                         Game1.currentLocation.createQuestionDialogue(
@@ -98,21 +97,20 @@ namespace ShopAnywhere
             };
             StardewValley.GameLocation.afterQuestionBehavior cat1Logic = (Farmer who, string cat1answers) =>
             {
-                if (cat1answers == "seedShop")
+                switch (cat1answers)
                 {
-                    Utility.TryOpenShopMenu(Game1.shop_generalStore, null, false);
-                }
-                else if (cat1answers == "fishShop")
-                {
-                    Utility.TryOpenShopMenu(Game1.shop_fish, null, false);
-                }
-                else if (cat1answers == "saloon")
-                {
-                    Utility.TryOpenShopMenu(Game1.shop_saloon, null, false);
-                }
-                else if (cat1answers == "return")
-                {
-                    MainCategory();
+                    case "seedShop":
+                        Utility.TryOpenShopMenu(Game1.shop_generalStore, null, false);
+                        break;
+                    case "fishShop":
+                        Utility.TryOpenShopMenu(Game1.shop_fish, null, false);
+                        break;
+                    case "saloon":
+                        Utility.TryOpenShopMenu(Game1.shop_saloon, null, false);
+                        break;
+                    case "return":
+                        MainCategory();
+                        break;
                 }
             };
             Game1.currentLocation.createQuestionDialogue(
@@ -134,25 +132,23 @@ namespace ShopAnywhere
             };
             StardewValley.GameLocation.afterQuestionBehavior cat2Logic = (Farmer who, string cat2answers) =>
             {
-                if (cat2answers == "adventureShop")
+                switch (cat2answers)
                 {
-                    Utility.TryOpenShopMenu(Game1.shop_adventurersGuild, null, false);
-                }
-                else if (cat2answers == "blacksmith")
-                {
-                    Utility.TryOpenShopMenu(Game1.shop_blacksmith, null, false);
-                }
-                else if (cat2answers == "toolUpgrades")
-                {
-                    Utility.TryOpenShopMenu(Game1.shop_blacksmithUpgrades, null, false);
-                }
-                else if (cat2answers == "desertTrader")
-                {
-                    Utility.TryOpenShopMenu(Game1.shop_desertTrader, null, false);
-                }
-                else if (cat2answers == "return2")
-                {
-                    MainCategory();
+                    case "adventureShop":
+                        Utility.TryOpenShopMenu(Game1.shop_adventurersGuild, null, false);
+                        break;
+                    case "blacksmith":
+                        Utility.TryOpenShopMenu(Game1.shop_blacksmith, null, false);
+                        break;
+                    case "toolUpgrades":
+                        Utility.TryOpenShopMenu(Game1.shop_blacksmithUpgrades, null, false);
+                        break;
+                    case "desertTrader":
+                        Utility.TryOpenShopMenu(Game1.shop_desertTrader, null, false);
+                        break;
+                    case "return2":
+                        MainCategory();
+                        break;
                 }
             };
             Game1.currentLocation.createQuestionDialogue(
@@ -172,22 +168,17 @@ namespace ShopAnywhere
             };
             StardewValley.GameLocation.afterQuestionBehavior cat3Logic = (Farmer who, string cat3answers) =>
             {
-                if (cat3answers == "carpenter")
+                switch (cat3answers)
                 {
-                    Utility.TryOpenShopMenu(Game1.shop_carpenter, null, false);
-                }
-                else if (cat3answers == "buildBuildings")
-                {
-                    DelayedAction.functionAfterDelay(() =>
-                    {
-                        lastLocationName = Game1.currentLocation.Name;
-                        lastTilePos = Game1.player.Tile;
-                        Game1.activeClickableMenu = new StardewValley.Menus.CarpenterMenu("Robin");
-                    }, 34);
-                }
-                else if (cat3answers == "return3")
-                {
-                    MainCategory();
+                    case "carpenter":
+                        Utility.TryOpenShopMenu(Game1.shop_carpenter, null, false);
+                        break;
+                    case "buildBuildings":
+                        BuildingMenu();
+                        break;
+                    case "return3":
+                        MainCategory();
+                        break;
                 }
             };
             Game1.currentLocation.createQuestionDialogue(
@@ -208,21 +199,20 @@ namespace ShopAnywhere
             };
             StardewValley.GameLocation.afterQuestionBehavior othLogic = (Farmer who, string othAnswers) =>
             {
-                if (othAnswers == "wanderingTrader")
+                switch (othAnswers)
                 {
-                    Utility.TryOpenShopMenu(Game1.shop_travelingCart, null, false);
-                }
-                else if (othAnswers == "dwarf")
-                {
-                    Utility.TryOpenShopMenu(Game1.shop_dwarf, null, false);
-                }
-                else if (othAnswers == "krobus")
-                {
-                    Utility.TryOpenShopMenu(Game1.shop_krobus, null, false);
-                }
-                else if (othAnswers == "othReturn")
-                {
-                    MainCategory();
+                    case "wanderingTrader":
+                        Utility.TryOpenShopMenu(Game1.shop_travelingCart, null, false);
+                        break;
+                    case "dwarf":
+                        Utility.TryOpenShopMenu(Game1.shop_dwarf, null, false);
+                        break;
+                    case "krobus":
+                        Utility.TryOpenShopMenu(Game1.shop_krobus, null, false);
+                        break;
+                    case "othReturn":
+                        MainCategory();
+                        break;
                 }
             };
             Game1.currentLocation.createQuestionDialogue(
@@ -261,6 +251,15 @@ namespace ShopAnywhere
                 Game1.player.forceCanMove();
                 Game1.exitActiveMenu();
             }, 50);
+        }
+        private static void BuildingMenu()
+        {
+            DelayedAction.functionAfterDelay(() =>
+            {
+                lastLocationName = Game1.currentLocation.Name;
+                lastTilePos = Game1.player.Tile;
+                Game1.activeClickableMenu = new StardewValley.Menus.CarpenterMenu("Robin");
+            }, 34);
         }
     }
 }
