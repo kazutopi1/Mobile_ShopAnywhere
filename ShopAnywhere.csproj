@@ -7,30 +7,25 @@
     <AssemblyName>ShopAnywhere</AssemblyName>
     <EnableHarmony>true</EnableHarmony>
     <OutputType>Library</OutputType>
-    <NoWarn>$(NoWarn);CA1416</NoWarn>
-    <NoWarn>$(NoWarn);CS8618</NoWarn>
-    <NoWarn>$(NoWarn);CS8622</NoWarn>
-    <NoWarn>$(NoWarn);CS8625</NoWarn>
+    <NoWarn>$(NoWarn);CA1416;CS8618;CS8622;CS8625</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
     <Reference Include="StardewValley">
       <HintPath>/root/sdv_mods/ModRef/StardewValley.dll</HintPath>
-    </Reference>                                                                                      
+    </Reference>
     <Reference Include="StardewModdingAPI">
       <HintPath>/root/sdv_mods/ModRef/StardewModdingAPI.dll</HintPath>
     </Reference>
-
     <Reference Include="MonoGame.Framework">
       <HintPath>/root/sdv_mods/ModRef/MonoGame.Framework.dll</HintPath>
     </Reference>
-
     <Reference Include="0Harmony">
       <HintPath>/root/sdv_mods/ModRef/0Harmony.dll</HintPath>
     </Reference>
-
     <Reference Include="SMAPI.Toolkit.CoreInterfaces">
       <HintPath>/root/sdv_mods/ModRef/SMAPI.Toolkit.CoreInterfaces.dll</HintPath>
     </Reference>
-  </ItemGroup>                                                                                        
+  </ItemGroup>
+
 </Project>
