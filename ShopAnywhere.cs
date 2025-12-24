@@ -7,40 +7,35 @@ using HarmonyLib;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
+using ShopAnywhere;
 
 namespace ShopAnywhere
 {
     public class Shop : Mod
     {
-        private static Response[] categories;
-        private static StardewValley.GameLocation.afterQuestionBehavior categoriesOptionsLogic;
-        private static Response[] cat1;
-        private static StardewValley.GameLocation.afterQuestionBehavior cat1Logic;
-        private static Response[] cat2;
-        private static StardewValley.GameLocation.afterQuestionBehavior cat2Logic;
-        private static Response[] cat3;
-        private static StardewValley.GameLocation.afterQuestionBehavior cat3Logic;
-        private static Response[] cat4;
-        private static StardewValley.GameLocation.afterQuestionBehavior cat4Logic;
-        private static Response[] oth;
-        private static StardewValley.GameLocation.afterQuestionBehavior othLogic;
-        private static bool wasBTapped = false;
-        private static string lastLocationName;
-        private static Vector2 lastTilePos;
+        public static Shop SA;
+        private Response[] categories, cat1, cat2, cat3, cat4, oth;
+        private StardewValley.GameLocation.afterQuestionBehavior categoriesOptionsLogic, cat1Logic, cat2Logic, cat3Logic, cat4Logic, othLogic;
+        private bool wasBTapped = false;
+        private string lastLocationName;
+        private Vector2 lastTilePos;
+        private bool warpBack = false;
         private const int Delay = 50;
         private const string KTShop = "(O)kt.shop";
-        private static bool warpBack = false;
+        private Harmony harmony;
 
         public override void Entry(IModHelper helper)
         {
+            SA = this;
+
             if (Constants.TargetPlatform != GamePlatform.Android)
                 return;
 
-            var harmony = new Harmony(this.ModManifest.UniqueID);
+            harmony = new Harmony(ModManifest.UniqueID);
 
             harmony.Patch(
                 original: AccessTools.PropertyGetter(typeof(VirtualJoypad), nameof(VirtualJoypad.ButtonBPressed)),
-                postfix: new HarmonyMethod(typeof(Shop), nameof(Postfix))
+                postfix: new HarmonyMethod(typeof(Shop), nameof(Shop.OpenMain))
             );
             harmony.Patch(
                 original: AccessTools.Method(typeof(Game1), nameof(Game1.warpFarmer), new[]
@@ -49,14 +44,18 @@ namespace ShopAnywhere
                 }),
                 postfix: new HarmonyMethod(typeof(Shop), nameof(Shop.WarpPlayer))
             );
-            harmony.Patch(
-                original: AccessTools.Method(typeof(Game1), nameof(Game1.exitActiveMenu)),
-                postfix: new HarmonyMethod(typeof(Shop), nameof(FlagReset))
-            );
             helper.Events.Input.ButtonPressed += Key;
             helper.Events.GameLoop.ReturnedToTitle += CleanUp;
             helper.Events.GameLoop.GameLaunched += QuestionDialogueCache;
+            helper.Events.Display.MenuChanged += FlagReset;
         }
+        private void MainCategory() { wasBTapped = false; QuestionDialogue("Categories", categories, categoriesOptionsLogic); }
+        private void category1() { QuestionDialogue("General Goods", cat1, cat1Logic); }
+        private void category2() { QuestionDialogue("Combat and Mining", cat2, cat2Logic); }
+        private void category3() { QuestionDialogue("Building", cat3, cat3Logic); }
+        private void category4() { QuestionDialogue("Animals", cat4, cat4Logic); }
+        private void others() { QuestionDialogue("Other Shops", oth, othLogic); }
+
         private void QuestionDialogueCache(object sender, GameLaunchedEventArgs e)
         {
             categories = new Response[]
@@ -141,7 +140,7 @@ namespace ShopAnywhere
                         Utility.TryOpenShopMenu(Game1.shop_blacksmithUpgrades, null, false);
                         break;
                     case "crushGeodes":
-                        CrushGeodeMenu();
+                        Game1.activeClickableMenu = new StardewValley.Menus.GeodeMenu();
                         break;
                     case "desertTrader":
                         DesertTrader();
@@ -227,6 +226,19 @@ namespace ShopAnywhere
                 }
             };
         }
+        private void QuestionDialogue(
+            string question,
+            Response[] answerChoices,
+            StardewValley.GameLocation.afterQuestionBehavior afterDialogueBehavior
+        )
+        {
+            Game1.currentLocation.createQuestionDialogue(
+                question: question,
+                answerChoices: answerChoices,
+                afterDialogueBehavior: afterDialogueBehavior,
+                speaker: null
+            );
+        }
         private void CleanUp(object sender, ReturnedToTitleEventArgs e)
         {
             warpBack = false;
@@ -244,79 +256,75 @@ namespace ShopAnywhere
                 }
             }
         }
-        private static void Postfix(ref bool __result)
+        private static void OpenMain(ref bool __result)
         {
-            if (Context.IsPlayerFree && !wasBTapped && __result)
+            if (Context.IsPlayerFree && !SA.wasBTapped && __result)
             {
-                if (Game1.player.CurrentItem is StardewValley.Item item)
+                if (Game1.player.CurrentItem?.QualifiedItemId == KTShop)
                 {
-                    if (item.QualifiedItemId == KTShop)
-                    {
-                        MainCategory();
-                    }
+                    SA.MainCategory();
                 }
             }
-            wasBTapped = __result;
+            SA.wasBTapped = __result;
         }
-        private static void FlagReset() { warpBack = false; }
-        private static void MainCategory() { wasBTapped = false; QuestionDialogue("Categories", categories, categoriesOptionsLogic); }
-        private static void category1() { QuestionDialogue("General Goods", cat1, cat1Logic); }
-        private static void category2() { QuestionDialogue("Combat and Mining", cat2, cat2Logic); }
-        private static void category3() { QuestionDialogue("Building", cat3, cat3Logic); }
-        private static void category4() { QuestionDialogue("Animals", cat4, cat4Logic); }
-        private static void others() { QuestionDialogue("Other Shops", oth, othLogic); }
-
+        private void Save()
+        {
+            warpBack = true;
+            lastLocationName = Game1.currentLocation.NameOrUniqueName;
+            lastTilePos = Game1.player.Tile;
+        }
         private static void WarpPlayer()
         {
-            if (!warpBack)
+            if (!SA.warpBack)
             {
                 return;
             }
-            warpBack = false;
-            Game1.warpFarmer(
-                lastLocationName,
-                (int)lastTilePos.X,
-                (int)lastTilePos.Y,
-                Game1.player.FacingDirection,
-                doFade: false
-            );
-            Game1.viewportHold = 0;
-            Game1.player.viewingLocation.Value = null;
-            Game1.displayHUD = true;
-            Game1.currentLocation.resetForPlayerEntry();
-            Game1.player.forceCanMove();
-            Game1.exitActiveMenu();
+            SA.warpBack = false;
+            Game1.globalFadeToBlack(() =>
+            {
+                Game1.warpFarmer(
+                    SA.lastLocationName,
+                    (int)SA.lastTilePos.X,
+                    (int)SA.lastTilePos.Y,
+                    Game1.player.FacingDirection,
+                    doFade: false
+                );
+                Game1.dialogueUp = false;
+                Game1.viewportHold = 0;
+                Game1.player.viewingLocation.Value = null;
+                Game1.displayFarmer = true;
+                Game1.displayHUD = true;
+                Game1.currentLocation.resetForPlayerEntry();
+                Game1.player.forceCanMove();
+                Game1.exitActiveMenu();
+            });
         }
-        private static void QuestionDialogue(
-            string question,
-            Response[] answerChoices,
-            StardewValley.GameLocation.afterQuestionBehavior afterDialogueBehavior
-        )
+        private void FlagReset(object sender, MenuChangedEventArgs e)
         {
-            Game1.currentLocation.createQuestionDialogue(
-                question: question,
-                answerChoices: answerChoices,
-                afterDialogueBehavior: afterDialogueBehavior,
-                speaker: null
-            );
+            if (e.NewMenu == null && warpBack) { warpBack = false; }
         }
-        private static void BuildingMenu(string npc)
+        private void BuildingMenu(string npc)
         {
-            warpBack = true;
-            lastLocationName = Game1.currentLocation.NameOrUniqueName;
-            lastTilePos = Game1.player.Tile;
+            Save();
             Game1.activeClickableMenu = new StardewValley.Menus.CarpenterMenu(npc);
         }
-        private static void MarnieMenu()
+        private void MarnieMenu()
         {
-            warpBack = true;
+            Save();
             var location = Game1.getFarm();
-            lastLocationName = Game1.currentLocation.NameOrUniqueName;
-            lastTilePos = Game1.player.Tile;
             List<StardewValley.Object> stock = Utility.getPurchaseAnimalStock(location);
             Game1.activeClickableMenu = new StardewValley.Menus.PurchaseAnimalsMenu(stock);
         }
-        private static void KrobusShop()
+        private void WizardMenu(string npc)
+        {
+            if (Game1.player.hasMagicInk)
+            {
+                Save();
+                Game1.activeClickableMenu = new StardewValley.Menus.CarpenterMenu(npc);
+            }
+            else { Game1.drawObjectDialogue("Return the Magic Ink to the Wizard to access this shop."); }
+        }
+        private void KrobusShop()
         {
             if (Game1.player.hasRustyKey)
             {
@@ -324,7 +332,7 @@ namespace ShopAnywhere
             }
             else { Game1.drawObjectDialogue("Acquire the Rusty Key first to access this Shop."); }
         }
-        private static void DesertTrader()
+        private void DesertTrader()
         {
             if (Game1.player.hasOrWillReceiveMail("ccVault") || Game1.player.hasOrWillReceiveMail("JojaVault"))
             {
@@ -332,7 +340,7 @@ namespace ShopAnywhere
             }
             else { Game1.drawObjectDialogue("Fix the Bus first to access this Shop."); }
         }
-        private static void DwarfShop()
+        private void DwarfShop()
         {
             if (Game1.player.canUnderstandDwarves)
             {
@@ -340,28 +348,13 @@ namespace ShopAnywhere
             }
             else { Game1.drawObjectDialogue("Donate all 4 Dwarf Scrolls to access this shop."); }
         }
-        private static void SandyShop()
+        private void SandyShop()
         {
             if (Game1.player.hasOrWillReceiveMail("ccVault") || Game1.player.hasOrWillReceiveMail("JojaVault"))
             {
                 Utility.TryOpenShopMenu(Game1.shop_sandy, null, false);
             }
             else { Game1.drawObjectDialogue("Fix the Bus first to access this Shop."); }
-        }
-        private static void WizardMenu(string npc)
-        {
-            if (Game1.player.hasMagicInk)
-            {
-                warpBack = true;
-                lastLocationName = Game1.currentLocation.NameOrUniqueName;
-                lastTilePos = Game1.player.Tile;
-                Game1.activeClickableMenu = new StardewValley.Menus.CarpenterMenu(npc);
-            }
-            else { Game1.drawObjectDialogue("Return the Magic Ink to the Wizard to access this shop."); }
-        }
-        private static void CrushGeodeMenu()
-        {
-            Game1.activeClickableMenu = new StardewValley.Menus.GeodeMenu();
         }
     }
 }
